@@ -233,15 +233,17 @@ void DrawItem(
     if (show_waveform) {
         float *sample = &waveform->sample_data[0];
         float mid_y = p0.y + height/2;
+        float prev_y = mid_y;
         for (int i=0; i<width; i++) {
             int s = (i / scale) * waveform->wav.sampleRate;
             if (s<0 || s>=waveform->num_samples) continue;
             float sample_value = sample[s];
             float sample_height = sample_value * height;
             draw_list->AddLine(
-                ImVec2(p0.x + i-1, mid_y),
+                ImVec2(p0.x + i-1, prev_y),
                 ImVec2(p0.x + i, mid_y + sample_height),
                 dark_edge_color);
+            prev_y = mid_y + sample_height;
         }
     }
 
