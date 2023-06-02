@@ -358,6 +358,7 @@ void MainInit(int argc, char** argv, int initial_width, int initial_height) {
     appState.timeline_width = initial_width * 0.8f;
 
     static struct option longopts[] = {
+        { "input",          required_argument,  NULL,   'i' },
         { "listen-port",    required_argument,  NULL,   'l' },
         { "send-port",      required_argument,  NULL,   's' },
         { "send-address",   required_argument,  NULL,   'a' },
@@ -365,9 +366,13 @@ void MainInit(int argc, char** argv, int initial_width, int initial_height) {
         { NULL,             0,                  NULL,   0 }
     };
 
+    std::string file_path;
     int ch;
-    while ((ch = getopt_long_only(argc, argv, "lsf:", longopts, NULL)) != -1) {
+    while ((ch = getopt_long_only(argc, argv, "lsf", longopts, NULL)) != -1) {
             switch (ch) {
+            case 'i':
+                    file_path = optarg;
+                    break;
             case 'l':
                     appState.osc_listen_port = atoi(optarg);
                     break;
@@ -385,8 +390,6 @@ void MainInit(int argc, char** argv, int initial_width, int initial_height) {
                     exit(1);
             }
     }
-    argc -= optind;
-    argv += optind;
 
     // Don't auto-save imgui.ini state file
     ImGuiIO& io = ImGui::GetIO();
@@ -397,8 +400,8 @@ void MainInit(int argc, char** argv, int initial_width, int initial_height) {
     LoadFonts();
     OSCSetup();
 
-    if (argc > 1) {
-        LoadFile(argv[1]);
+    if (file_path != "") {
+        LoadFile(file_path.c_str());
     } else {
         auto tl = new otio::Timeline();
         LoadTimeline(tl);
