@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;        // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;      // Enable Multi-Viewport / Platform Windows
 #ifdef POWER_SAVING
-    io.ConfigFlags |= ImGuiConfigFlags_EnablePowerSavingMode;
+//    io.ConfigFlags |= ImGuiConfigFlags_EnablePowerSavingMode;
 #endif
 
     // Setup style
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 #ifdef POWER_SAVING
             ImGui_ImplGlfw_WaitForEvent();
 #else
-            glfwWaitEvents();
+//            glfwWaitEvents();
 #endif
             // Poll and handle events (inputs, window resize, etc.)
             // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
