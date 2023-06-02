@@ -118,6 +118,10 @@ struct AppState {
     bool show_demo_window = false;
     bool show_metrics = false;
     bool show_implot_demo_window = false;
+
+    int osc_listen_port = 9000;
+    int osc_send_port = 9001;
+    std::string osc_send_address = "127.0.0.1";
 };
 
 extern AppState appState;

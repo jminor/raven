@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
@@ -89,12 +90,16 @@ void OSCCallback( const char * address, const char * type, void ** parameters )
 
 void OSCSetup() {
     int err;
-    // Input port, output port, remote address
-    osc = minioscInit(9000, 9001, "127.0.0.1", &err);
+    osc = minioscInit(appState.osc_listen_port,
+                      appState.osc_send_port,
+                      appState.osc_send_address.c_str(),
+                      &err);
     if (osc == NULL) {
         Message("ERROR: OSC setup failed (%d)", err);
         return;
     }
+    printf("OSC listening on port %d\n", appState.osc_listen_port);
+    printf("OSC sending to %s port %d\n", appState.osc_send_address.c_str(), appState.osc_send_port);
 }
 
 void OSCPoll() {
@@ -336,8 +341,52 @@ void SaveFile(std::string path) {
         elapsed_seconds);
 }
 
+void PrintUsage(const char *argv0) {
+    printf("Usage: %s [options] [input-file]\n"
+"Options:\n"
+"    --listen-port <port>     = listen for OSC messages on this port (default %d)\n"
+"    --send-port <port>       = send OSC messages to this port (default %d)\n"
+"    --send-address <address> = send OSC messages to this address (default %s)\n"
+"    --help                   = show this help message\n",
+           argv0,
+           appState.osc_listen_port,
+           appState.osc_send_port,
+           appState.osc_send_address.c_str());
+}
+
 void MainInit(int argc, char** argv, int initial_width, int initial_height) {
     appState.timeline_width = initial_width * 0.8f;
+
+    static struct option longopts[] = {
+        { "listen-port",    required_argument,  NULL,   'l' },
+        { "send-port",      required_argument,  NULL,   's' },
+        { "send-address",   required_argument,  NULL,   'a' },
+        { "help",           no_argument,        NULL,   'h' },
+        { NULL,             0,                  NULL,   0 }
+    };
+
+    int ch;
+    while ((ch = getopt_long_only(argc, argv, "lsf:", longopts, NULL)) != -1) {
+            switch (ch) {
+            case 'l':
+                    appState.osc_listen_port = atoi(optarg);
+                    break;
+            case 's':
+                    appState.osc_send_port = atoi(optarg);
+                    break;
+            case 'a':
+                    appState.osc_send_address = optarg;
+                    break;
+            case 'h':
+                    PrintUsage(argv[0]);
+                    exit(0);
+            default:
+                    PrintUsage(argv[0]);
+                    exit(1);
+            }
+    }
+    argc -= optind;
+    argv += optind;
 
     // Don't auto-save imgui.ini state file
     ImGuiIO& io = ImGui::GetIO();
