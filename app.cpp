@@ -20,6 +20,12 @@
 #include <chrono>
 #include <iostream>
 
+#define MINIOSC_IMPLEMENTATION
+#include "miniosc.h"
+#include "os_generic.h"
+
+miniosc *osc;
+
 void DrawMenu();
 void DrawToolbar(ImVec2 buttonSize);
 
@@ -64,6 +70,42 @@ std::string Format(const char* format, ...) {
     vsnprintf(buf, sizeof(buf), format, args);
     va_end(args);
     return std::string(buf);
+}
+
+extern "C" {
+// Called when an OSC message is received.
+void OSCCallback( const char * address, const char * type, void ** parameters )
+{
+    if (!strcmp("/playhead/seconds", address) && !strcmp(",f", type)) {
+        double seconds = (double)*((float*)parameters[0]);
+    	printf("OSC RCV: %s %s %f\n", address, type, seconds);
+        SeekPlayhead(seconds, false);
+    }else{
+        // TODO: Check "type" to get parameters
+    	printf("OSC RCV: %s %s [UNRECOGNIZED]\n", address, type);
+    }
+}
+}
+
+void OSCSetup() {
+    int err;
+    // Input port, output port, remote address
+    osc = minioscInit(9000, 9001, "127.0.0.1", &err);
+    if (osc == NULL) {
+        Message("ERROR: OSC setup failed (%d)", err);
+        return;
+    }
+}
+
+void OSCPoll() {
+    minioscPoll(osc, 20, OSCCallback);
+}
+
+void OSCSendPlayhead() {
+    double seconds = appState.playhead.to_seconds(); 
+    printf("OSC SND: /playhead/seconds %g\n", seconds);
+    minioscSend( osc, "/playhead/seconds", ",f", seconds);
+    // minioscSend( osc, "/playhead/opentime", ",ff", appState.playhead.value(), appState.playhead.rate());
 }
 
 void LoadFonts() {
@@ -304,6 +346,7 @@ void MainInit(int argc, char** argv, int initial_width, int initial_height) {
     ApplyAppStyle();
 
     LoadFonts();
+    OSCSetup();
 
     if (argc > 1) {
         LoadFile(argv[1]);
@@ -325,6 +368,7 @@ void AppUpdate() { }
 
 void MainGui() {
     AppUpdate();
+    OSCPoll();
 
     char window_title[1024];
     auto filename = appState.file_path.substr(appState.file_path.find_last_of("/\\") + 1);
@@ -795,13 +839,16 @@ void SelectObject(
     UpdateJSONInspector();
 }
 
-void SeekPlayhead(double seconds) {
+void SeekPlayhead(double seconds, bool broadcast) {
     double lower_limit = appState.playhead_limit.start_time().to_seconds();
     double upper_limit = appState.playhead_limit.end_time_exclusive().to_seconds();
     seconds = fmax(lower_limit, fmin(upper_limit, seconds));
     appState.playhead = otio::RationalTime::from_seconds(seconds, appState.playhead.rate());
     if (appState.snap_to_frames) {
         SnapPlayhead();
+    }
+    if (broadcast) {
+        OSCSendPlayhead();
     }
 }
 

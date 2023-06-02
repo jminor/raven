@@ -50,6 +50,10 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/libs/nativefiledialog/src/include
 )
 
+include_directories(
+  ${PROJECT_SOURCE_DIR}/libs/miniosc
+)
+
 set(OTIO_SHARED_LIBS OFF)
 add_subdirectory("libs/opentimelineio")
 include_directories(

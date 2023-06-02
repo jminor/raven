@@ -133,7 +133,7 @@ std::string otio_error_string(otio::ErrorStatus const& error_status);
 void SelectObject(
     otio::SerializableObject* object,
     otio::SerializableObject* context = NULL);
-void SeekPlayhead(double seconds);
+void SeekPlayhead(double seconds, bool broadcast=true);
 void SnapPlayhead();
 void DetectPlayheadLimits();
 void FitZoomWholeTimeline();
