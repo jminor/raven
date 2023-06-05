@@ -115,7 +115,8 @@ int main(int argc, char** argv)
 #ifdef POWER_SAVING
             ImGui_ImplGlfw_WaitForEvent();
 #else
-            glfwWaitEvents();
+            // Disable this temporarily since we need to respond to incoming network messages via MQTT
+            // glfwWaitEvents();
 #endif
             // Poll and handle events (inputs, window resize, etc.)
             // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
