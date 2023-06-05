@@ -2,6 +2,8 @@
 
 An experimental re-write of [OpenTimelineIO](https://opentimeline.io)'s `otioview` timeline viewer application.
 
+**OSC Branch:** This `osc` branch includes a feature to synchronize the playhead between applications via [Open Sound Control](https://opensoundcontrol.stanford.edu/). Run `raven -h` and look at the source code for `OSCSendPlayhead()` for details.
+
 This tool aims to replace [otioview](https://github.com/AcademySoftwareFoundation/OpenTimelineIO/tree/main/src/opentimelineview) but it is missing a few essential features (see "Help Wanted" and "To Do" below). Contributions are welcome!
 
 [![build](https://github.com/OpenTimelineIO/raven/actions/workflows/build.yaml/badge.svg)](https://github.com/OpenTimelineIO/raven/actions/workflows/build.yaml)
