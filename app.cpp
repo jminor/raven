@@ -299,9 +299,9 @@ void SaveFile(std::string path) {
 void PrintUsage(const char *argv0) {
     printf("Usage: %s [options] [input-file]\n"
 "Options:\n"
-"    --mqtt-address <address> = MQTT broker address (default %s)\n"
-"    --mqtt-port <port>       = MQTT broker connection port (default %s)\n"
-"    --help                   = show this help message\n",
+"    -a / --mqtt-address <address> = MQTT broker address (default %s)\n"
+"    -p / --mqtt-port <port>       = MQTT broker connection port (default %s)\n"
+"    -h / --help                   = show this help message\n",
            argv0,
            appState.mqtt_address,
            appState.mqtt_port);
