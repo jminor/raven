@@ -2,6 +2,8 @@
 
 An experimental re-write of [OpenTimelineIO](https://opentimeline.io)'s `otioview` timeline viewer application.
 
+**MQTT Branch:** This `mqtt` branch includes a feature to synchronize the playhead between applications via [MQTT](https://mqtt.org). Run `raven -h` and look at `network.cpp` for details. Note: By default a public MQTT broker is used, but running a local MQTT broker provides better response times when scrubbing the playhead.
+
 This tool aims to replace [otioview](https://github.com/AcademySoftwareFoundation/OpenTimelineIO/tree/main/src/opentimelineview) but it is missing a few essential features (see "Help Wanted" and "To Do" below). Contributions are welcome!
 
 [![build](https://github.com/OpenTimelineIO/raven/actions/workflows/build.yaml/badge.svg)](https://github.com/OpenTimelineIO/raven/actions/workflows/build.yaml)
