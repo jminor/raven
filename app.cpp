@@ -358,7 +358,6 @@ void MainInit(int argc, char** argv, int initial_width, int initial_height) {
     appState.timeline_width = initial_width * 0.8f;
 
     static struct option longopts[] = {
-        { "input",          required_argument,  NULL,   'i' },
         { "listen-port",    required_argument,  NULL,   'l' },
         { "send-port",      required_argument,  NULL,   's' },
         { "send-address",   required_argument,  NULL,   'a' },
@@ -368,11 +367,8 @@ void MainInit(int argc, char** argv, int initial_width, int initial_height) {
 
     std::string file_path;
     int ch;
-    while ((ch = getopt_long_only(argc, argv, "lsf", longopts, NULL)) != -1) {
+    while ((ch = getopt_long_only(argc, argv, "l:s:a:h", longopts, NULL)) != -1) {
             switch (ch) {
-            case 'i':
-                    file_path = optarg;
-                    break;
             case 'l':
                     appState.osc_listen_port = atoi(optarg);
                     break;
@@ -390,6 +386,13 @@ void MainInit(int argc, char** argv, int initial_width, int initial_height) {
                     exit(1);
             }
     }
+    // Skip the options that were processed by getopt_long_only()
+    argv += optind;
+    argc -= optind;
+
+    // Remaining non-option argument is a file path
+    if (argc > 0) file_path = argv[0];
+    if (argc > 1) Log("WARNING: Ignoring extra command line arguments: %s ...", argv[1]);
 
     // Don't auto-save imgui.ini state file
     ImGuiIO& io = ImGui::GetIO();
