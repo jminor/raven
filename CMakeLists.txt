@@ -16,6 +16,7 @@ target_sources(raven
     timeline.h
     colors.h
     widgets.h
+    network.h
 
     app.cpp
     editing.cpp
@@ -23,6 +24,7 @@ target_sources(raven
     timeline.cpp
     colors.cpp
     widgets.cpp
+    network.cpp
 
     fonts/embedded_font.inc
 )
@@ -46,11 +48,14 @@ endif()
 
 add_subdirectory("libs")
 
+option(MQTT_C_EXAMPLES OFF)
+add_subdirectory("libs/MQTT-C")
+
 include_directories(
   ${PROJECT_SOURCE_DIR}/libs/nativefiledialog/src/include
 )
 
-set(OTIO_SHARED_LIBS OFF)
+option(OTIO_SHARED_LIBS OFF)
 add_subdirectory("libs/opentimelineio")
 include_directories(
   ${PROJECT_SOURCE_DIR}/libs/opentimelineio/src
@@ -81,6 +86,7 @@ target_compile_definitions(raven
 target_link_libraries(raven PUBLIC
     OTIO::opentimelineio
     IMGUI
+    mqttc
 )
 
 if (APPLE)

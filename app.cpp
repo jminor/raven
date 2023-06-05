@@ -10,6 +10,7 @@
 #include "imgui_internal.h"
 
 #include "widgets.h"
+#include "network.h"
 
 #ifndef EMSCRIPTEN
 #include "nfd.h"
@@ -304,6 +305,7 @@ void MainInit(int argc, char** argv, int initial_width, int initial_height) {
     ApplyAppStyle();
 
     LoadFonts();
+    MQTTSetup();
 
     if (argc > 1) {
         LoadFile(argv[1]);
@@ -325,6 +327,9 @@ void AppUpdate() { }
 
 void MainGui() {
     AppUpdate();
+
+    MQTTRefresher();
+    MQTTSendPlayhead();
 
     char window_title[1024];
     auto filename = appState.file_path.substr(appState.file_path.find_last_of("/\\") + 1);

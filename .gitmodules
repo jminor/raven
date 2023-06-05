@@ -16,3 +16,6 @@
 [submodule "libs/ImGuiColorTextEdit"]
 	path = libs/ImGuiColorTextEdit
 	url = https://github.com/jminor/ImGuiColorTextEdit.git
+[submodule "libs/MQTT-C"]
+	path = libs/MQTT-C
+	url = https://github.com/LiamBindle/MQTT-C.git
