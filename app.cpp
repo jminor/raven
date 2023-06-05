@@ -329,7 +329,6 @@ void MainGui() {
     AppUpdate();
 
     MQTTRefresher();
-    MQTTSendPlayhead();
 
     char window_title[1024];
     auto filename = appState.file_path.substr(appState.file_path.find_last_of("/\\") + 1);
@@ -800,13 +799,16 @@ void SelectObject(
     UpdateJSONInspector();
 }
 
-void SeekPlayhead(double seconds) {
+void SeekPlayhead(double seconds, bool broadcast) {
     double lower_limit = appState.playhead_limit.start_time().to_seconds();
     double upper_limit = appState.playhead_limit.end_time_exclusive().to_seconds();
     seconds = fmax(lower_limit, fmin(upper_limit, seconds));
     appState.playhead = otio::RationalTime::from_seconds(seconds, appState.playhead.rate());
     if (appState.snap_to_frames) {
         SnapPlayhead();
+    }
+    if (broadcast) {
+        MQTTSendPlayhead();
     }
 }
 

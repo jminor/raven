@@ -29,6 +29,9 @@ void MQTTSetup()
         Log("ERROR: %s\n", mqtt_error_str(client.error));
         return;
     }
+
+    // Subscribe to this topic
+    mqtt_subscribe(&client, appState.mqtt_topic, 0);
 }
 
 void MQTTRefresher()
@@ -45,7 +48,7 @@ void MQTTSendPlayhead()
     // print a message
     char application_message[256];
     snprintf(application_message, sizeof(application_message), "%f", appState.playhead.to_seconds());
-    Log("Sending: %s \"%s\"", topic, application_message);
+    Log("MQTT OUT: %s %s", topic, application_message);
 
     // publish the time
     mqtt_publish(&client, topic, application_message, strlen(application_message) + 1, MQTT_PUBLISH_QOS_0);
@@ -59,6 +62,13 @@ void MQTTSendPlayhead()
 extern "C" {
 void MQTTCallback(void** unused, struct mqtt_response_publish *published)
 {
+    // note that published->topic_name is NOT null-terminated (here we'll use %.*s precision)
+    Log("MQTT  IN: %.*s %s", published->topic_name_size, published->topic_name, (const char*) published->application_message);
 
+    size_t len = strlen(appState.mqtt_topic);
+    if (published->topic_name_size == len && !strncmp((const char*)published->topic_name, appState.mqtt_topic, len)) {
+        double seconds = atof((const char*)published->application_message);
+        SeekPlayhead(seconds, false);
+    }
 }
 }
