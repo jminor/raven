@@ -119,9 +119,8 @@ struct AppState {
     bool show_metrics = false;
     bool show_implot_demo_window = false;
 
-    const char *mqtt_address = "localhost"; //"test.mosquitto.org";
+    const char *mqtt_address = "test.mosquitto.org";
     const char *mqtt_port = "1883";
-    const char *mqtt_topic = "opentimelineio/raven/playhead";
 };
 
 extern AppState appState;

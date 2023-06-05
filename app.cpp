@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
@@ -295,7 +296,52 @@ void SaveFile(std::string path) {
         elapsed_seconds);
 }
 
+void PrintUsage(const char *argv0) {
+    printf("Usage: %s [options] [input-file]\n"
+"Options:\n"
+"    --mqtt-address <address> = MQTT broker address (default %s)\n"
+"    --mqtt-port <port>       = MQTT broker connection port (default %s)\n"
+"    --help                   = show this help message\n",
+           argv0,
+           appState.mqtt_address,
+           appState.mqtt_port);
+}
+
 void MainInit(int argc, char** argv, int initial_width, int initial_height) {
+
+    static struct option longopts[] = {
+        { "mqtt-address",   required_argument,  NULL,   'a' },
+        { "mqtt-port",      required_argument,  NULL,   'p' },
+        { "help",           no_argument,        NULL,   'h' },
+        { NULL,             0,                  NULL,   0 }
+    };
+
+    std::string file_path;
+    int ch;
+    while ((ch = getopt_long_only(argc, argv, "a:p:h", longopts, NULL)) != -1) {
+            switch (ch) {
+            case 'a':
+                    appState.mqtt_address = strdup(optarg);
+                    break;
+            case 'p':
+                    appState.mqtt_port = strdup(optarg);
+                    break;
+            case 'h':
+                    PrintUsage(argv[0]);
+                    exit(0);
+            default:
+                    PrintUsage(argv[0]);
+                    exit(1);
+            }
+    }
+    // Skip the options that were processed by getopt_long_only()
+    argv += optind;
+    argc -= optind;
+
+    // Remaining non-option argument is a file path
+    if (argc > 0) file_path = argv[0];
+    if (argc > 1) Log("WARNING: Ignoring extra command line arguments: %s ...", argv[1]);
+
     appState.timeline_width = initial_width * 0.8f;
 
     // Don't auto-save imgui.ini state file
@@ -305,10 +351,10 @@ void MainInit(int argc, char** argv, int initial_width, int initial_height) {
     ApplyAppStyle();
 
     LoadFonts();
-    MQTTSetup();
+    MQTTSetup(appState.mqtt_address, appState.mqtt_port);
 
-    if (argc > 1) {
-        LoadFile(argv[1]);
+    if (file_path != "") {
+        LoadFile(file_path.c_str());
     } else {
         auto tl = new otio::Timeline();
         LoadTimeline(tl);
@@ -323,12 +369,12 @@ bool IconButton(const char* label, const ImVec2 size = ImVec2(0, 0)) {
     return result;
 }
 
-void AppUpdate() { }
+void AppUpdate() {
+    MQTTRefresher();
+}
 
 void MainGui() {
     AppUpdate();
-
-    MQTTRefresher();
 
     char window_title[1024];
     auto filename = appState.file_path.substr(appState.file_path.find_last_of("/\\") + 1);
