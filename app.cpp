@@ -254,6 +254,7 @@ void LoadFile(std::string path) {
             "Error loading \"%s\": %s",
             path.c_str(),
             otio_error_string(error_status).c_str());
+        timeline = nullptr;
         return;
     }
 
@@ -355,7 +356,9 @@ void MainInit(int argc, char** argv, int initial_width, int initial_height) {
 
     if (file_path != "") {
         LoadFile(file_path.c_str());
-    } else {
+    }
+
+    if (appState.timeline == nullptr) {
         auto tl = new otio::Timeline();
         LoadTimeline(tl);
     }
