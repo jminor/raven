@@ -775,8 +775,8 @@ void DrawMarkersInspector() {
             if (ImGui::Selectable(TimecodeStringFromTime(global_time).c_str(),
                                   is_selected,
                                   selectable_flags)) {
-                appState.playhead = global_time;
                 SelectObject(marker, parent);
+                appState.playhead = global_time;
                 appState.scroll_to_playhead = true;
             }
 
@@ -867,9 +867,8 @@ void DrawEffectsInspector() {
             if (ImGui::Selectable(TimecodeStringFromTime(global_time).c_str(),
                                     is_selected,
                                     selectable_flags)) {
-                printf("DEBUG: clicked %s\n", TimecodeStringFromTime(global_time).c_str());
-                appState.playhead = global_time;
                 SelectObject(effect, parent);
+                appState.playhead = global_time;
                 appState.scroll_to_playhead = true;
             }
 
@@ -939,8 +938,8 @@ void DrawClipsInspector() {
             auto global_time = clip->transformed_time(source_range->start_time(), root) + global_start;
             auto is_selected = (appState.selected_object == clip);
             if (ImGui::Selectable(TimecodeStringFromTime(global_time).c_str(), is_selected, selectable_flags)) {
-                appState.playhead = global_time;
                 SelectObject(clip);
+                appState.playhead = global_time;
                 appState.scroll_to_playhead = true;
             }
 
